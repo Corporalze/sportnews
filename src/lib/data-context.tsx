@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { Article, Match, Team, Player, Category, Poll } from '@/types';
+import { createContext, useContext, type ReactNode, useState, useEffect } from 'react';
+import type { Article, Match, Team, Player, Category, Poll } from '@/types';
 import { mockArticles, mockMatches, mockTeams, mockPlayers, mockCategories, mockPolls } from '@/lib/mock-data';
 import DataService from '@/lib/data-service';
 

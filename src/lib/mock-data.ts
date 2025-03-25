@@ -1,5 +1,5 @@
 // Mock data for development
-import { Article, Match, Team, Player, Category, Poll } from '@/types';
+import type { Article, Match, Team, Player, Category, Poll } from '@/types';
 
 export const mockArticles: Article[] = [
   {
@@ -32,10 +32,10 @@ export const mockArticles: Article[] = [
   },
   {
     id: '3',
-    title: 'Tactical Analysis: How Morocco's Defense Shut Down Spain',
+    title: 'Tactical Analysis: How Morocco\'s Defense Shut Down Spain',
     slug: 'tactical-analysis-how-moroccos-defense-shut-down-spain',
-    content: 'A deep dive into the tactical masterclass by Morocco's coach, utilizing a compact 4-3-3 formation that neutralized Spain's tiki-taka style.',
-    excerpt: 'A deep dive into the tactical masterclass by Morocco's coach against Spain.',
+    content: 'A deep dive into the tactical masterclass by Morocco\'s coach, utilizing a compact 4-3-3 formation that neutralized Spain\'s tiki-taka style.',
+    excerpt: 'A deep dive into the tactical masterclass by Morocco\'s coach against Spain.',
     featuredImage: '/images/mock/tactics.jpg',
     author: 'Carlos Mendez',
     publishDate: '2025-03-22T09:15:00Z',

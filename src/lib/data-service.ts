@@ -1,8 +1,9 @@
-import { Article, Match, Team, Player, Category, Poll } from '@/types';
+import type { Article, Match, Team, Player, Category, Poll } from '@/types';
 import { mockArticles, mockMatches, mockTeams, mockPlayers, mockCategories, mockPolls } from './mock-data';
 import { FootballAPI, NewsAPI, useMockData } from './api-service';
 
 // Helper function to convert football-data.org team to our Team type
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const convertApiTeam = (apiTeam: any): Team => {
   return {
     id: apiTeam.id.toString(),
@@ -16,6 +17,7 @@ const convertApiTeam = (apiTeam: any): Team => {
 };
 
 // Helper function to convert football-data.org match to our Match type
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const convertApiMatch = (apiMatch: any, teams: Team[]): Match => {
   const homeTeam = teams.find(t => t.id === apiMatch.homeTeam.id.toString()) || {
     id: apiMatch.homeTeam.id.toString(),
@@ -57,6 +59,7 @@ const convertApiMatch = (apiMatch: any, teams: Team[]): Match => {
 };
 
 // Helper function to convert football-data.org player to our Player type
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const convertApiPlayer = (apiPlayer: any, teamId: string): Player => {
   return {
     id: apiPlayer.id.toString(),
@@ -71,6 +74,7 @@ const convertApiPlayer = (apiPlayer: any, teamId: string): Player => {
 };
 
 // Helper function to convert News API article to our Article type
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const convertNewsArticle = (apiArticle: any, categories: string[] = ['News']): Article => {
   return {
     id: apiArticle.url, // Using URL as a unique ID
@@ -90,7 +94,7 @@ const convertNewsArticle = (apiArticle: any, categories: string[] = ['News']): A
 
 // Data service class to fetch and manage data
 class DataService {
-  private competitionId: string = '2015'; // Default to French Ligue 1, can be changed
+  private competitionId = '2015'; // Default to French Ligue 1, can be changed
   
   // Fetch teams from API or use mock data
   async fetchTeams(): Promise<Team[]> {
@@ -133,7 +137,8 @@ class DataService {
         return mockMatches;
       }
       
-      return matchesData.matches.map((match: any) => convertApiMatch(match, teams));
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            return matchesData.matches.map((match: any) => convertApiMatch(match, teams));
     } catch (error) {
       console.error('Error in fetchMatches:', error);
       return mockMatches;
@@ -153,6 +158,7 @@ class DataService {
       for (const team of teams.slice(0, 5)) { // Limit to 5 teams to avoid rate limiting
         const playersData = await FootballAPI.getTeamPlayers(team.id);
         if (playersData) {
+          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
           const teamPlayers = playersData.map((player: any) => convertApiPlayer(player, team.id));
           allPlayers = [...allPlayers, ...teamPlayers];
         }
@@ -189,11 +195,13 @@ class DataService {
       }
       
       // Convert and combine news articles
-      const generalArticles = footballNews.articles.map((article: any) => 
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+                  const generalArticles = footballNews.articles.map((article: any) => 
         convertNewsArticle(article, ['International', 'Football'])
       );
       
-      const moroccanArticles = moroccanNews.articles.map((article: any) => 
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            const moroccanArticles = moroccanNews.articles.map((article: any) => 
         convertNewsArticle(article, ['Morocco', 'Botola Pro'])
       );
       
