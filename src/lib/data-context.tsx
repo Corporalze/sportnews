@@ -47,6 +47,9 @@ const DataContext = createContext<DataContextType>({
   addMatch: () => {},
   updateMatch: () => {},
   deleteMatch: () => {},
+  addCategory: () => {},
+  updateCategory: () => {},
+  deleteCategory: () => {},
 });
 
 // Provider component that wraps the app and makes data available
