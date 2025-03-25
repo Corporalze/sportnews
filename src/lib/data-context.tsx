@@ -24,6 +24,9 @@ interface DataContextType {
   addMatch: (match: Match) => void;
   updateMatch: (match: Match) => void;
   deleteMatch: (id: string) => void;
+  addCategory: (category: Category) => void;
+  updateCategory: (category: Category) => void;
+  deleteCategory: (id: string) => void;
 }
 
 // Create the context with default values
@@ -136,24 +139,41 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     setMatches(prev => prev.filter(m => m.id !== id));
   };
 
-  const value = {
-    articles,
-    matches,
-    teams,
-    players,
-    categories,
-    polls,
-    loading,
-    error,
-    refreshArticles,
-    refreshMatches,
-    addArticle,
-    updateArticle,
-    deleteArticle,
-    addMatch,
-    updateMatch,
-    deleteMatch,
-  };
+  // Add these functions to the DataProvider component
+const addCategory = (category: Category) => {
+  setCategories(prev => [category, ...prev]);
+};
+
+const updateCategory = (category: Category) => {
+  setCategories(prev => prev.map(c => c.id === category.id ? category : c));
+};
+
+const deleteCategory = (id: string) => {
+  setCategories(prev => prev.filter(c => c.id !== id));
+};
+
+// Make sure to include them in the value object
+const value = {
+  articles,
+  matches,
+  teams,
+  players,
+  categories,
+  polls,
+  loading,
+  error,
+  refreshArticles,
+  refreshMatches,
+  addArticle,
+  updateArticle,
+  deleteArticle,
+  addMatch,
+  updateMatch,
+  deleteMatch,
+  addCategory,
+  updateCategory,
+  deleteCategory,
+};
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };
