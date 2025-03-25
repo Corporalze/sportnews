@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useData } from '@/lib/data-context';
-import { Match } from '@/types';
+import type { Match } from '@/types';
 
 export default function MatchForm({ match }: { match?: Match }) {
   const router = useRouter();
@@ -71,8 +72,8 @@ export default function MatchForm({ match }: { match?: Match }) {
         id: match?.id || `match-${Date.now()}`,
         homeTeam,
         awayTeam,
-        homeScore: homeScore ? parseInt(homeScore) : undefined,
-        awayScore: awayScore ? parseInt(awayScore) : undefined,
+        homeScore: homeScore ? Number.parseInt(homeScore) : undefined,
+        awayScore: awayScore ? Number.parseInt(awayScore) : undefined,
         date,
         time,
         venue,
@@ -244,7 +245,7 @@ export default function MatchForm({ match }: { match?: Match }) {
             <select
               id="status"
               value={status}
-              onChange={(e) => setStatus(e.target.value)}
+              onChange={(e) => setStatus(e.target.value as 'scheduled' | 'live' | 'completed' | 'postponed' | 'canceled')}
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
                 errors.status ? 'border-red-500' : 'border-gray-300'
               }`}
