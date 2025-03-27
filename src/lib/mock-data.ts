@@ -1,5 +1,5 @@
 import { formatDate, slugify } from '@/utils/helpers';
-import { Article, Match, Team, Player, Category, Poll } from '@/types';
+import type { Article, Match, Team, Player, Category, Poll } from '@/types';
 
 // Mock Articles
 export const mockArticles: Article[] = [
@@ -29,7 +29,7 @@ The win moves Raja to within two points of league leaders RS Berkane, while Wyda
   },
   {
     id: '2',
-    title: 'Morocco's Atlas Lions Announce Squad for World Cup Qualifiers',
+    title: 'Morocco\'s Atlas Lions Announce Squad for World Cup Qualifiers',
     slug: 'morocco-atlas-lions-announce-squad-for-world-cup-qualifiers',
     content: `Morocco national team coach Walid Regragui has announced a 26-man squad for the upcoming 2026 FIFA World Cup qualifiers against Tanzania and Congo.
 
@@ -138,7 +138,7 @@ The 50-year-old will oversee all technical aspects of the club, including first-
 Wydad President Said Naciri expressed his satisfaction with the appointment: "Noureddine brings a wealth of experience and knowledge to our club. His vision aligns perfectly with our ambitions to remain at the forefront of African football."
 
 Naybet's first task will be to work with head coach Mehdi Nafti to strengthen the squad during the upcoming transfer window.`,
-    excerpt: 'Wydad Athletic Club has appointed former Morocco international Noureddine Naybet as the club's new Technical Director.',
+    excerpt: 'Wydad Athletic Club has appointed former Morocco international Noureddine Naybet as the club\'s new Technical Director.',
     author: 'Hassan Elbaz',
     publishDate: '2025-03-03T11:30:00Z',
     categories: ['Moroccan Football', 'Botola Pro'],

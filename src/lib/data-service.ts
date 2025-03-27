@@ -14,7 +14,7 @@ import {
   mockCategories, 
   mockPolls 
 } from './mock-data';
-import { Article, Match, Team, Player, Category, Poll } from '@/types';
+import { type Article, type Match, type Team, Player, Category, Poll } from '@/types';
 
 // Convert API responses to our data models
 const convertNewsToArticles = (newsData: any): Article[] => {
