@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { Article } from '@/types';
-import { formatDate, truncateText } from '@/utils/helpers';
+import Link from 'next/link';
+import { formatDate } from '@/utils/helpers';
 
 interface ArticleCardProps {
   article: Article;
@@ -15,109 +14,108 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   article, 
   variant = 'default' 
 }) => {
-  const { 
-    title, 
-    slug, 
-    excerpt, 
-    featuredImage, 
-    author, 
-    publishDate, 
-    categories 
-  } = article;
-
+  const { id, title, slug, excerpt, author, publishDate, categories, featuredImage } = article;
+  
+  // Featured variant (large card with image and excerpt)
   if (variant === 'featured') {
     return (
-      <div className="relative h-[500px] w-full overflow-hidden rounded-lg shadow-lg group">
-        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10"></div>
-        <Image
-          src={featuredImage || '/images/placeholder.jpg'}
-          alt={title}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-          <div className="flex space-x-2 mb-3">
-            {categories.slice(0, 2).map((category) => (
+      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+        <div className="relative h-64 bg-gray-200">
+          {featuredImage ? (
+            <img 
+              src={featuredImage} 
+              alt={title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-blue-100">
+              <span className="text-blue-900 font-medium">Ayuursport</span>
+            </div>
+          )}
+          {categories && categories.length > 0 && (
+            <div className="absolute top-4 left-4">
               <Link 
-                key={category} 
-                href={`/news/category/${category.toLowerCase()}`}
-                className="bg-amber-500 text-blue-900 text-xs font-bold px-2 py-1 rounded"
+                href={`/news/${categories[0].toLowerCase().replace(/\s+/g, '-')}`}
+                className="bg-blue-900 text-white text-xs font-bold px-3 py-1 rounded-full"
               >
-                {category}
+                {categories[0]}
               </Link>
-            ))}
-          </div>
-          <h2 className="text-3xl font-bold text-white mb-3">
-            <Link href={`/news/${slug}`} className="hover:text-amber-400">
+            </div>
+          )}
+        </div>
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-2 text-blue-900 hover:text-amber-500 transition-colors">
+            <Link href={`/news/${slug}`}>
               {title}
             </Link>
           </h2>
-          <p className="text-gray-200 mb-4">{truncateText(excerpt, 150)}</p>
-          <div className="flex items-center text-gray-300 text-sm">
-            <span>By {author}</span>
-            <span className="mx-2">•</span>
+          <p className="text-gray-600 mb-4">{excerpt}</p>
+          <div className="flex justify-between items-center text-sm text-gray-500">
+            <span>{author}</span>
             <span>{formatDate(publishDate)}</span>
           </div>
         </div>
       </div>
     );
   }
-
+  
+  // Compact variant (small card with minimal info)
   if (variant === 'compact') {
     return (
-      <div className="flex items-start space-x-4 mb-4">
-        <div className="relative h-20 w-20 flex-shrink-0">
-          <Image
-            src={featuredImage || '/images/placeholder.jpg'}
-            alt={title}
-            fill
-            className="object-cover rounded"
-          />
-        </div>
-        <div>
-          <h3 className="font-semibold text-sm mb-1">
-            <Link href={`/news/${slug}`} className="hover:text-amber-500">
-              {truncateText(title, 60)}
+      <div className="bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors">
+        <h3 className="text-base font-medium mb-1 text-blue-900 hover:text-amber-500 transition-colors">
+          <Link href={`/news/${slug}`}>
+            {title}
+          </Link>
+        </h3>
+        <div className="flex justify-between items-center text-xs text-gray-500">
+          <span>{formatDate(publishDate)}</span>
+          {categories && categories.length > 0 && (
+            <Link 
+              href={`/news/${categories[0].toLowerCase().replace(/\s+/g, '-')}`}
+              className="text-blue-600 hover:underline"
+            >
+              {categories[0]}
             </Link>
-          </h3>
-          <div className="text-xs text-gray-500">
-            {formatDate(publishDate)}
-          </div>
+          )}
         </div>
       </div>
     );
   }
-
-  // Default variant
+  
+  // Default variant (medium card with image)
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <div className="relative h-48 w-full">
-        <Image
-          src={featuredImage || '/images/placeholder.jpg'}
-          alt={title}
-          fill
-          className="object-cover"
-        />
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+      <div className="relative h-48 bg-gray-200">
+        {featuredImage ? (
+          <img 
+            src={featuredImage} 
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-blue-100">
+            <span className="text-blue-900 font-medium">Ayuursport</span>
+          </div>
+        )}
+        {categories && categories.length > 0 && (
+          <div className="absolute top-3 left-3">
+            <Link 
+              href={`/news/${categories[0].toLowerCase().replace(/\s+/g, '-')}`}
+              className="bg-blue-900 text-white text-xs font-bold px-2 py-1 rounded-full"
+            >
+              {categories[0]}
+            </Link>
+          </div>
+        )}
       </div>
       <div className="p-4">
-        <div className="flex space-x-2 mb-2">
-          {categories.slice(0, 1).map((category) => (
-            <Link 
-              key={category} 
-              href={`/news/category/${category.toLowerCase()}`}
-              className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded"
-            >
-              {category}
-            </Link>
-          ))}
-        </div>
-        <h3 className="text-xl font-bold mb-2">
-          <Link href={`/news/${slug}`} className="hover:text-amber-600">
+        <h3 className="text-lg font-bold mb-2 text-blue-900 hover:text-amber-500 transition-colors">
+          <Link href={`/news/${slug}`}>
             {title}
           </Link>
         </h3>
-        <p className="text-gray-600 text-sm mb-4">{truncateText(excerpt, 100)}</p>
-        <div className="flex justify-between items-center text-sm text-gray-500">
+        <div className="flex justify-between items-center text-xs text-gray-500">
           <span>{author}</span>
           <span>{formatDate(publishDate)}</span>
         </div>

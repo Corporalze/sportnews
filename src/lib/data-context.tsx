@@ -1,11 +1,17 @@
 'use client';
 
-import { createContext, useContext, type ReactNode, useState, useEffect } from 'react';
-import type { Article, Match, Team, Player, Category, Poll } from '@/types';
-import { mockArticles, mockMatches, mockTeams, mockPlayers, mockCategories, mockPolls } from '@/lib/mock-data';
-import DataService from '@/lib/data-service';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Article, Match, Team, Player, Category, Poll } from '@/types';
+import { 
+  fetchAndConvertNews, 
+  fetchAndConvertMatches, 
+  fetchAndConvertTeams, 
+  mockPlayers, 
+  mockCategories, 
+  mockPolls 
+} from './data-service';
 
-// Define the shape of our data context
+// Define the context type
 interface DataContextType {
   articles: Article[];
   matches: Match[];
@@ -52,49 +58,52 @@ const DataContext = createContext<DataContextType>({
   deleteCategory: () => {},
 });
 
-// Provider component that wraps the app and makes data available
+// Provider component
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const [articles, setArticles] = useState<Article[]>(mockArticles);
-  const [matches, setMatches] = useState<Match[]>(mockMatches);
-  const [teams, setTeams] = useState<Team[]>(mockTeams);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [players, setPlayers] = useState<Player[]>(mockPlayers);
   const [categories, setCategories] = useState<Category[]>(mockCategories);
   const [polls, setPolls] = useState<Poll[]>(mockPolls);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch all data on initial load
+  // Initial data fetch
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        const data = await DataService.fetchAllData();
+        // Fetch articles, matches, and teams
+        const [articlesData, matchesData, teamsData] = await Promise.all([
+          fetchAndConvertNews(),
+          fetchAndConvertMatches(),
+          fetchAndConvertTeams()
+        ]);
         
-        setTeams(data.teams);
-        setMatches(data.matches);
-        setPlayers(data.players);
-        setArticles(data.articles);
-        setCategories(data.categories);
-        setPolls(data.polls);
+        setArticles(articlesData);
+        setMatches(matchesData);
+        setTeams(teamsData);
       } catch (err) {
-        console.error('Error fetching data:', err);
+        console.error('Error fetching initial data:', err);
         setError('Failed to load data. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchData();
+    
+    fetchInitialData();
   }, []);
 
-  // Refresh articles from API
+  // Refresh functions
   const refreshArticles = async () => {
     try {
       setLoading(true);
-      const newArticles = await DataService.fetchArticles();
-      setArticles(newArticles);
+      setError(null);
+      const articlesData = await fetchAndConvertNews();
+      setArticles(articlesData);
     } catch (err) {
       console.error('Error refreshing articles:', err);
       setError('Failed to refresh articles. Please try again later.');
@@ -103,12 +112,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Refresh matches from API
   const refreshMatches = async () => {
     try {
       setLoading(true);
-      const newMatches = await DataService.fetchMatches(teams);
-      setMatches(newMatches);
+      setError(null);
+      const matchesData = await fetchAndConvertMatches();
+      setMatches(matchesData);
     } catch (err) {
       console.error('Error refreshing matches:', err);
       setError('Failed to refresh matches. Please try again later.');
@@ -117,7 +126,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Admin functions for content management
+  // CRUD operations for articles
   const addArticle = (article: Article) => {
     setArticles(prev => [article, ...prev]);
   };
@@ -130,6 +139,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     setArticles(prev => prev.filter(a => a.id !== id));
   };
 
+  // CRUD operations for matches
   const addMatch = (match: Match) => {
     setMatches(prev => [match, ...prev]);
   };
@@ -142,50 +152,48 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     setMatches(prev => prev.filter(m => m.id !== id));
   };
 
-  // Add these functions to the DataProvider component
-const addCategory = (category: Category) => {
-  setCategories(prev => [category, ...prev]);
+  // CRUD operations for categories
+  const addCategory = (category: Category) => {
+    setCategories(prev => [category, ...prev]);
+  };
+
+  const updateCategory = (category: Category) => {
+    setCategories(prev => prev.map(c => c.id === category.id ? category : c));
+  };
+
+  const deleteCategory = (id: string) => {
+    setCategories(prev => prev.filter(c => c.id !== id));
+  };
+
+  // Context value
+  const value = {
+    articles,
+    matches,
+    teams,
+    players,
+    categories,
+    polls,
+    loading,
+    error,
+    refreshArticles,
+    refreshMatches,
+    addArticle,
+    updateArticle,
+    deleteArticle,
+    addMatch,
+    updateMatch,
+    deleteMatch,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+  };
+
+  return (
+    <DataContext.Provider value={value}>
+      {children}
+    </DataContext.Provider>
+  );
 };
 
-const updateCategory = (category: Category) => {
-  setCategories(prev => prev.map(c => c.id === category.id ? category : c));
-};
-
-const deleteCategory = (id: string) => {
-  setCategories(prev => prev.filter(c => c.id !== id));
-};
-
-// Make sure to include them in the value object
-const value = {
-  articles,
-  matches,
-  teams,
-  players,
-  categories,
-  polls,
-  loading,
-  error,
-  refreshArticles,
-  refreshMatches,
-  addArticle,
-  updateArticle,
-  deleteArticle,
-  addMatch,
-  updateMatch,
-  deleteMatch,
-  addCategory,
-  updateCategory,
-  deleteCategory,
-};
-
-  return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
-};
-
-// Custom hook to use the data context
-export const useData = () => {
-  const context = useContext(DataContext);
-  if (context === undefined) {
-    throw new Error('useData must be used within a DataProvider');
-  }
-  return context;
-};
+// Custom hook for using the context
+export const useData = () => useContext(DataContext);

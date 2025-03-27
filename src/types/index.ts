@@ -1,43 +1,27 @@
-// Define core data types for the application
-
 export interface Article {
   id: string;
   title: string;
   slug: string;
   content: string;
   excerpt: string;
-  featuredImage: string;
   author: string;
   publishDate: string;
   categories: string[];
   tags: string[];
+  featuredImage?: string;
   isFeatured: boolean;
-  viewCount: number;
-}
-
-export interface Match {
-  id: string;
-  homeTeam: Team;
-  awayTeam: Team;
-  homeScore?: number;
-  awayScore?: number;
-  date: string;
-  time: string;
-  venue: string;
-  competition: string;
-  status: 'scheduled' | 'live' | 'completed' | 'postponed' | 'canceled';
-  matchWeek?: number;
-  highlights?: string;
+  viewCount?: number;
 }
 
 export interface Team {
   id: string;
   name: string;
   shortName: string;
-  logo: string;
+  logo?: string;
   country: string;
   founded: number;
   stadium?: string;
+  coach?: string;
 }
 
 export interface Player {
@@ -45,10 +29,56 @@ export interface Player {
   name: string;
   position: string;
   nationality: string;
-  dateOfBirth: string;
+  birthDate: string;
+  height?: number;
+  weight?: number;
   teamId: string;
-  image?: string;
   jerseyNumber?: number;
+  image?: string;
+}
+
+export interface Match {
+  id: string;
+  date: string;
+  time: string;
+  competition: string;
+  matchWeek?: number;
+  homeTeam: {
+    id: string;
+    name: string;
+    logo?: string;
+  };
+  awayTeam: {
+    id: string;
+    name: string;
+    logo?: string;
+  };
+  venue: string;
+  status: 'scheduled' | 'live' | 'completed' | 'postponed' | 'canceled';
+  homeScore?: number;
+  awayScore?: number;
+  stats?: {
+    possession?: {
+      home: number;
+      away: number;
+    };
+    shots?: {
+      home: number;
+      away: number;
+    };
+    shotsOnTarget?: {
+      home: number;
+      away: number;
+    };
+    corners?: {
+      home: number;
+      away: number;
+    };
+    fouls?: {
+      home: number;
+      away: number;
+    };
+  };
 }
 
 export interface Category {
@@ -61,22 +91,13 @@ export interface Category {
 export interface Poll {
   id: string;
   question: string;
-  options: PollOption[];
+  options: {
+    id: string;
+    text: string;
+    votes: number;
+  }[];
+  totalVotes: number;
   startDate: string;
   endDate: string;
   isActive: boolean;
-}
-
-export interface PollOption {
-  id: string;
-  text: string;
-  votes: number;
-}
-
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: 'admin' | 'editor' | 'user';
-  name?: string;
 }

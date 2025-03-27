@@ -1,72 +1,136 @@
 'use client';
 
-import React from 'react';
-import { Poll, PollOption } from '@/types';
+import React, { useState } from 'react';
+import { Poll } from '@/types';
 
 interface PollWidgetProps {
   poll: Poll;
-  onVote?: (pollId: string, optionId: string) => void;
 }
 
-const PollWidget: React.FC<PollWidgetProps> = ({ poll, onVote }) => {
-  const { id, question, options, isActive } = poll;
+const PollWidget: React.FC<PollWidgetProps> = ({ poll }) => {
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [hasVoted, setHasVoted] = useState(false);
+  const [localPoll, setLocalPoll] = useState<Poll>(poll);
   
-  // Calculate total votes
-  const totalVotes = options.reduce((sum, option) => sum + option.votes, 0);
-  
-  // Calculate percentage for each option
-  const getPercentage = (votes: number): number => {
-    if (totalVotes === 0) return 0;
-    return Math.round((votes / totalVotes) * 100);
+  // Calculate percentages
+  const calculatePercentage = (votes: number) => {
+    if (localPoll.totalVotes === 0) return 0;
+    return Math.round((votes / localPoll.totalVotes) * 100);
   };
   
-  const handleVote = (optionId: string) => {
-    if (onVote && isActive) {
-      onVote(id, optionId);
-    }
+  // Handle vote
+  const handleVote = () => {
+    if (!selectedOption || hasVoted) return;
+    
+    // Update local poll data
+    const updatedOptions = localPoll.options.map(option => {
+      if (option.id === selectedOption) {
+        return { ...option, votes: option.votes + 1 };
+      }
+      return option;
+    });
+    
+    setLocalPoll({
+      ...localPoll,
+      options: updatedOptions,
+      totalVotes: localPoll.totalVotes + 1
+    });
+    
+    setHasVoted(true);
+  };
+  
+  // Check if poll is active
+  const isPollActive = () => {
+    if (!localPoll.isActive) return false;
+    
+    const now = new Date();
+    const startDate = new Date(localPoll.startDate);
+    const endDate = new Date(localPoll.endDate);
+    
+    return now >= startDate && now <= endDate;
   };
   
   return (
     <div className="bg-white rounded-lg shadow-md p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold text-blue-900">Poll</h3>
-        {isActive ? (
-          <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Active</span>
-        ) : (
-          <span className="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded">Closed</span>
-        )}
-      </div>
-      
-      <h4 className="text-md font-semibold mb-4">{question}</h4>
+      <h3 className="text-lg font-bold text-blue-900 mb-4">{localPoll.question}</h3>
       
       <div className="space-y-3">
-        {options.map((option: PollOption) => (
+        {localPoll.options.map(option => (
           <div key={option.id} className="space-y-1">
-            <div className="flex justify-between items-center">
-              <span className="text-sm">{option.text}</span>
-              <span className="text-sm font-medium">{getPercentage(option.votes)}%</span>
-            </div>
-            <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                className="absolute top-0 left-0 h-full bg-amber-500"
-                style={{ width: `${getPercentage(option.votes)}%` }}
-              ></div>
-            </div>
-            {isActive && (
-              <button 
-                onClick={() => handleVote(option.id)}
-                className="text-xs text-blue-600 hover:text-blue-800 mt-1"
-              >
-                Vote
-              </button>
+            {/* Option with radio button (before voting) */}
+            {!hasVoted && (
+              <div className="flex items-center">
+                <input
+                  type="radio"
+                  id={`option-${option.id}`}
+                  name="poll-option"
+                  value={option.id}
+                  checked={selectedOption === option.id}
+                  onChange={() => setSelectedOption(option.id)}
+                  disabled={!isPollActive()}
+                  className="mr-2"
+                />
+                <label 
+                  htmlFor={`option-${option.id}`}
+                  className="text-gray-700 cursor-pointer"
+                >
+                  {option.text}
+                </label>
+              </div>
+            )}
+            
+            {/* Results bar (after voting) */}
+            {hasVoted && (
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-medium">{option.text}</span>
+                  <span className="text-gray-600">{calculatePercentage(option.votes)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className={`h-2.5 rounded-full ${
+                      selectedOption === option.id ? 'bg-amber-500' : 'bg-blue-600'
+                    }`}
+                    style={{ width: `${calculatePercentage(option.votes)}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {option.votes} {option.votes === 1 ? 'vote' : 'votes'}
+                </div>
+              </div>
             )}
           </div>
         ))}
       </div>
       
-      <div className="text-xs text-gray-500 mt-4 text-center">
-        Total votes: {totalVotes}
+      {/* Vote button */}
+      {!hasVoted && (
+        <button
+          onClick={handleVote}
+          disabled={!selectedOption || !isPollActive()}
+          className={`mt-4 w-full py-2 px-4 rounded-md font-medium ${
+            selectedOption && isPollActive()
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          Vote
+        </button>
+      )}
+      
+      {/* Total votes */}
+      <div className="mt-4 text-sm text-gray-500 text-center">
+        {localPoll.totalVotes} {localPoll.totalVotes === 1 ? 'vote' : 'votes'} total
       </div>
+      
+      {/* Poll status */}
+      {!isPollActive() && (
+        <div className="mt-2 text-xs text-center text-red-500">
+          {new Date() < new Date(localPoll.startDate)
+            ? 'This poll has not started yet'
+            : 'This poll has ended'}
+        </div>
+      )}
     </div>
   );
 };
